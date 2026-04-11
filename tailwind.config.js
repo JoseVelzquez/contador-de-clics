@@ -7,7 +7,8 @@ export default {
         sans: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"]
       },
       boxShadow: {
-        glass: "0 10px 40px -18px rgba(15, 23, 42, 0.55)"
+        glass:
+          "0 10px 40px -18px rgba(15, 23, 42, 0.55), 0 0 0 1px rgba(255,255,255,0.06) inset"
       },
       keyframes: {
         pulseScale: {

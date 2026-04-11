@@ -1,52 +1,62 @@
-import { useEffect } from "react";
+import { motion } from "framer-motion";
 
-const Counter = ({
-  count,
-  goal,
-  progress,
-  remaining,
-  reachedGoal,
-  isAnimating,
-  setIsAnimating
-}) => {
-  useEffect(() => {
-    if (!isAnimating) return undefined;
+const container = {
+  hidden: { opacity: 0, y: 8 },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.32, ease: [0.22, 1, 0.36, 1] }
+  }
+};
 
-    const timer = setTimeout(() => setIsAnimating(false), 260);
-    return () => clearTimeout(timer);
-  }, [isAnimating, setIsAnimating]);
+const Counter = ({ count, reachedGoal, theme }) => {
+  const isDark = theme === "dark";
 
   return (
-    <section className="space-y-6">
-      <div className="text-center">
-        <p className="text-sm text-slate-500 dark:text-slate-400">
-          Contador de clics
-        </p>
-        <p
-          className={`mt-2 text-6xl font-extrabold text-slate-900 transition dark:text-white sm:text-7xl ${isAnimating ? "animate-pulseScale" : ""}`}
+    <motion.section
+      variants={container}
+      initial="hidden"
+      animate="show"
+      className="text-center"
+      aria-live="polite"
+      aria-atomic="true"
+    >
+      <p
+        className={`text-[11px] font-medium uppercase tracking-[0.14em] ${
+          isDark ? "text-[#9CA3AF]" : "text-slate-500"
+        }`}
+      >
+        Contador de clics
+      </p>
+      <div className="relative mt-3 flex min-h-[3.25rem] items-center justify-center py-1 sm:mt-4 sm:min-h-[3.5rem]">
+        <motion.span
+          key={count}
+          role="status"
+          aria-label={`Clics actuales: ${count}`}
+          initial={{ scale: 0.94, opacity: 0.55 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ type: "spring", stiffness: 380, damping: 26 }}
+          className={`select-none text-[2.75rem] font-semibold tabular-nums leading-none tracking-tight sm:text-5xl ${
+            isDark ? "text-[#F9FAFB]" : "text-slate-900"
+          }`}
         >
           {count}
-        </p>
+        </motion.span>
       </div>
-
-      <div className="space-y-2">
-        <div className="flex items-center justify-between text-xs font-medium text-slate-500 dark:text-slate-400">
-          <span>Meta: {goal} clics</span>
-          <span>{Math.round(progress)}%</span>
-        </div>
-        <div className="h-2 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800">
-          <div
-            className="h-full rounded-full bg-emerald-500 transition-all duration-300 ease-out dark:bg-blue-500"
-            style={{ width: `${progress}%` }}
-          />
-        </div>
-        <p className="text-xs text-slate-500 dark:text-slate-400">
-          {reachedGoal
-            ? "Objetivo completado. Excelente consistencia."
-            : `Te faltan ${remaining} clics para completar el objetivo.`}
-        </p>
-      </div>
-    </section>
+      {reachedGoal && (
+        <motion.p
+          initial={{ opacity: 0, y: 3 }}
+          animate={{ opacity: 1, y: 0 }}
+          className={`mt-3 inline-flex items-center justify-center rounded-full px-3 py-1 text-xs font-medium ${
+            isDark
+              ? "bg-emerald-500/15 text-emerald-400"
+              : "bg-emerald-50 text-emerald-700"
+          }`}
+        >
+          Meta alcanzada
+        </motion.p>
+      )}
+    </motion.section>
   );
 };
 

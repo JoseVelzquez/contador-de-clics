@@ -1,68 +1,101 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
-const STORAGE_KEY = "click-counter-value";
-const THEME_KEY = "click-counter-theme";
-const GOAL = 100;
+const STORAGE_COUNT = "click-counter-value";
+const STORAGE_THEME = "click-counter-theme";
+const STORAGE_GOAL = "click-counter-goal";
 
-const getStoredCounter = () => {
-  const stored = localStorage.getItem(STORAGE_KEY);
-  const value = Number(stored);
-  return Number.isNaN(value) ? 0 : Math.max(0, value);
+const DEFAULT_GOAL = 100;
+const MIN_GOAL = 1;
+const MAX_GOAL = 9999;
+
+const readNumber = (key, fallback) => {
+  const raw = localStorage.getItem(key);
+  const n = Number(raw);
+  return Number.isNaN(n) ? fallback : n;
+};
+
+const getStoredCount = () => {
+  const v = readNumber(STORAGE_COUNT, 0);
+  return Math.max(0, Math.floor(v));
 };
 
 const getStoredTheme = () => {
-  const storedTheme = localStorage.getItem(THEME_KEY);
-  return storedTheme === "light" ? "light" : "dark";
+  const stored = localStorage.getItem(STORAGE_THEME);
+  return stored === "light" ? "light" : "dark";
+};
+
+const getStoredGoal = () => {
+  const v = readNumber(STORAGE_GOAL, DEFAULT_GOAL);
+  const g = Math.floor(v);
+  if (g < MIN_GOAL || g > MAX_GOAL) return DEFAULT_GOAL;
+  return g;
 };
 
 export const useCounter = () => {
-  const [count, setCount] = useState(() => getStoredCounter());
-  const [theme, setTheme] = useState(() => getStoredTheme());
-  const [isAnimating, setIsAnimating] = useState(false);
+  const [count, setCount] = useState(getStoredCount);
+  const [theme, setTheme] = useState(getStoredTheme);
+  const [goal, setGoal] = useState(getStoredGoal);
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, String(count));
+    localStorage.setItem(STORAGE_COUNT, String(count));
   }, [count]);
 
   useEffect(() => {
-    localStorage.setItem(THEME_KEY, theme);
+    localStorage.setItem(STORAGE_THEME, theme);
     document.documentElement.classList.toggle("dark", theme === "dark");
   }, [theme]);
 
-  const increment = () => {
-    setCount((prev) => prev + 1);
-    setIsAnimating(true);
-  };
+  useEffect(() => {
+    localStorage.setItem(STORAGE_GOAL, String(goal));
+  }, [goal]);
 
-  const reset = () => {
-    const shouldReset = window.confirm(
-      "Se reiniciara el contador a 0. Deseas continuar?"
-    );
+  useEffect(() => {
+    document.title = `Clicks: ${count} · Click Counter Pro`;
+  }, [count]);
 
-    if (shouldReset) {
-      setCount(0);
-    }
-  };
+  const progress = useMemo(
+    () => Math.min((count / goal) * 100, 100),
+    [count, goal]
+  );
+  const remaining = Math.max(goal - count, 0);
+  const reachedGoal = count >= goal;
 
-  const toggleTheme = () => {
-    setTheme((current) => (current === "dark" ? "light" : "dark"));
-  };
+  const increment = useCallback(() => {
+    setCount((prev) => {
+      if (prev >= goal) return prev;
+      return prev + 1;
+    });
+  }, [goal]);
 
-  const progress = useMemo(() => Math.min((count / GOAL) * 100, 100), [count]);
-  const remaining = Math.max(GOAL - count, 0);
-  const reachedGoal = count >= GOAL;
+  const decrement = useCallback(() => {
+    setCount((prev) => Math.max(0, prev - 1));
+  }, []);
+
+  const resetCount = useCallback(() => {
+    setCount(0);
+  }, []);
+
+  const setGoalClamped = useCallback((value) => {
+    const n = Math.floor(Number(value));
+    if (Number.isNaN(n)) return;
+    setGoal(Math.min(MAX_GOAL, Math.max(MIN_GOAL, n)));
+  }, []);
+
+  const toggleTheme = useCallback(() => {
+    setTheme((c) => (c === "dark" ? "light" : "dark"));
+  }, []);
 
   return {
     count,
-    goal: GOAL,
+    goal,
+    setGoal: setGoalClamped,
     progress,
     remaining,
     reachedGoal,
     theme,
-    isAnimating,
-    setIsAnimating,
     increment,
-    reset,
+    decrement,
+    resetCount,
     toggleTheme
   };
 };
