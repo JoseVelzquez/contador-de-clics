@@ -1,10 +1,43 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
-  <rect width="32" height="32" rx="9" fill="url(#g)"/>
-  <path d="M16 8v16M10 14h12" stroke="white" stroke-width="2.2" stroke-linecap="round"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="Click Counter">
   <defs>
-    <linearGradient id="g" x1="6" y1="4" x2="26" y2="28" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#10b981"/>
-      <stop offset="1" stop-color="#0ea5e9"/>
+    <linearGradient id="fav-surface" x1="6" y1="4" x2="28" y2="30" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0f172a"/>
+      <stop offset="0.45" stop-color="#1e1b4b"/>
+      <stop offset="1" stop-color="#020617"/>
+    </linearGradient>
+    <linearGradient id="fav-plus" x1="11" y1="9" x2="21" y2="23" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#6ee7b7"/>
+      <stop offset="1" stop-color="#059669"/>
     </linearGradient>
   </defs>
+  <!-- Squircle -->
+  <rect width="32" height="32" rx="9" fill="url(#fav-surface)"/>
+  <!-- Borde sutil (legible en pestañas claras y oscuras) -->
+  <rect
+    x="0.5"
+    y="0.5"
+    width="31"
+    height="31"
+    rx="8.5"
+    fill="none"
+    stroke="url(#fav-plus)"
+    stroke-opacity="0.35"
+    stroke-width="1"
+  />
+  <!-- Plus: incremento / contador -->
+  <path
+    d="M16 10.5v11M10.5 16h11"
+    stroke="url(#fav-plus)"
+    stroke-width="2.75"
+    stroke-linecap="round"
+  />
+  <!-- Brillo muy suave esquina (profundidad) -->
+  <path
+    d="M9 8.5c3.5-1.8 8-1.5 11.2 0.8"
+    stroke="#fff"
+    stroke-opacity="0.12"
+    stroke-width="1.25"
+    stroke-linecap="round"
+    fill="none"
+  />
 </svg>
